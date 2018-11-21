@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache  
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://www.ehcache.org/ehcache.xsd"
+	updateCheck="true"
+	monitoring="autodetect"
+	dynamicConfig="true">
+
+	<diskStore path="java.io.tmpdir/demand" />
+
+	<defaultCache
+			maxElementsInMemory="10000"
+			eternal="false"
+			timeToIdleSeconds="600"
+			timeToLiveSeconds="3600"
+			overflowToDisk="true" />
+
+	<cache name="org.hibernate.cache.internal.StandardQueryCache"
+		   maxEntriesLocalHeap="5"
+		   eternal="false"
+		   timeToLiveSeconds="120">
+		<persistence strategy="localTempSwap"/>
+	</cache>
+	<cache name="org.hibernate.cache.spi.UpdateTimestampsCache"
+		   maxEntriesLocalHeap="5000"
+		   eternal="true">
+		<persistence strategy="localTempSwap"/>
+	</cache>
+
+	<cache name="pro.jsoft.demand.persistence.model.Demand"
+		   maxElementsInMemory="10000"
+		   eternal="true"
+		   overflowToDisk="true" />
+	<cache name="pro.jsoft.demand.persistence.model.Demand.stages"
+		   maxElementsInMemory="10000"
+		   eternal="true"
+		   overflowToDisk="true" />
+	<cache name="pro.jsoft.demand.persistence.model.Demand.values"
+		   maxElementsInMemory="10000"
+		   eternal="true"
+		   overflowToDisk="true" />
+	<cache name="pro.jsoft.demand.persistence.model.Demand.files"
+		   maxElementsInMemory="10000"
+		   eternal="true"
+		   overflowToDisk="true" />
+	<cache name="pro.jsoft.demand.persistence.model.Value"
+		   maxElementsInMemory="10000"
+		   eternal="true"
+		   overflowToDisk="true" />
+	<cache name="pro.jsoft.demand.persistence.model.Stage"
+		   maxElementsInMemory="10000"
+		   eternal="true"
+		   overflowToDisk="true" />
+	<cache name="pro.jsoft.demand.persistence.model.Form"
+		   maxElementsInMemory="10000"
+		   eternal="true"
+		   overflowToDisk="true" />
+	<cache name="pro.jsoft.demand.persistence.model.Form.fields"
+		   maxElementsInMemory="10000"
+		   eternal="true"
+		   overflowToDisk="true" />
+	<cache name="pro.jsoft.demand.persistence.model.Field"
+		   maxElementsInMemory="10000"
+		   eternal="true"
+		   overflowToDisk="true" />
+	<cache name="pro.jsoft.demand.persistence.model.File"
+		   maxElementsInMemory="10000"
+		   eternal="true"
+		   overflowToDisk="true" />
+	<cache name="pro.jsoft.demand.persistence.model.FileComplete"
+		   maxElementsInMemory="10000"
+		   eternal="true"
+		   overflowToDisk="true" />
+	<cache name="pro.jsoft.demand.persistence.model.Rules"
+		   maxElementsInMemory="10000"
+		   eternal="true"
+		   overflowToDisk="true" />
+	<cache name="pro.jsoft.demand.persistence.model.Executor"
+		   maxElementsInMemory="10000"
+		   eternal="true"
+		   overflowToDisk="true" />
+</ehcache>
