@@ -1,0 +1,32 @@
+{
+  "action-DO_PRINT" : "Распечатать",
+  "action-DO_UPLOAD" : "Загрузить файлы",
+  "action-DO_DOWNLOAD" : "Открыть файл",
+  "action-DO_RATE" : "Оценить",
+  "action-STEP_CREATE" : "Создать",
+  "action-STEP_CONFIRM" : "Утвердить",
+  "action-STEP_ACCEPT" : "Принять",
+  "action-STEP_REACCEPT" : "Забрать",
+  "action-STEP_PROCESS" : "Обработать",
+  "action-STEP_ASKAPPROVE" : "Запросить разрешение",
+  "action-STEP_APPROVE" : "Разрешить",
+  "action-STEP_FINISH" : "Завершить",
+  "action-STEP_CANCEL" : "Отозвать",
+  "action-STEP_ASKREFUSE" : "Запросить отклонение",
+  "action-STEP_REFUSE" : "Отклонить",
+
+  "stage-STEP_CREATE" : "Ожидает согласования",
+  "stage-STEP_CONFIRM" : "Передана исполнителю",
+  "stage-STEP_ACCEPT" : "Принята исполнителем",
+  "stage-STEP_REACCEPT" : "Изменен исполнитель",
+  "stage-STEP_PROCESS" : "Обрабатывается",
+  "stage-STEP_ASKAPPROVE" : "Запрос разрешения",
+  "stage-STEP_APPROVE" : "Разрешена к исполнению",
+  "stage-STEP_FINISH" : "Завершена",
+  "stage-STEP_CANCEL" : "Отозвана автором",
+  "stage-STEP_ASKREFUSE" : "Запрос отклонения",
+  "stage-STEP_REFUSE" : "Отклонена",
+
+  "error-404" : "Не найдено",
+  "error-413" : "Слишком большой файл"
+}
