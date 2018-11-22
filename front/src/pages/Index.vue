@@ -817,12 +817,12 @@ export default {
           }
           ++this.tablePagination.rowsNumber
 
-          this.$q.notify({ message: this.$t('form_sent'), color: 'positive', icon: 'thumb_up' })
+          this.$q.notify({ message: this.$t('form_saved'), color: 'positive', icon: 'thumb_up' })
           this.tableLoading = false
         })
         .catch(error => {
           let message = this.formatErrorMessage(error)
-          this.$q.notify({ message: `${this.$t('saving_error')}: ${message}`, color: 'negative', icon: 'report_problem' })
+          this.$q.notify({ message: `${this.$t('form_saving_error')}: ${message}`, color: 'negative', icon: 'report_problem' })
           this.tableLoading = false
         })
     },
@@ -1262,11 +1262,11 @@ export default {
 
         if (this.$v.stage.$error) {
           let errorMessage = []
-          if (!this.$v.stage.recipientName.required) errorMessage.push('Не указан адресат')
-          else if (!this.$v.stage.recipientUid.required) errorMessage.push('Адресат не является пользователем портала')
-          if (!this.$v.stage.comment.required) errorMessage.push('Не указан текст')
-          if (!this.$v.stage.comment.maxLength) errorMessage.push(`Слишком большой текст (не более ${this.maxTextLength} символов)`)
-          this.$q.notify({ message: `Запрос содержит ошибки: ${errorMessage.join(', ')}`, color: 'negative', icon: 'report_problem' })
+          if (!this.$v.stage.recipientName.required) errorMessage.push(this.$t('recipient_required'))
+          else if (!this.$v.stage.recipientUid.required) errorMessage.push(this.$t('recipient_invalid'))
+          if (!this.$v.stage.comment.required) errorMessage.push(this.$t('add_message'))
+          if (!this.$v.stage.comment.maxLength) errorMessage.push(this.$t('textarea_length'))
+          this.$q.notify({ message: `${this.$t('form_invalid')}: ${errorMessage.join(', ')}`, color: 'negative', icon: 'report_problem' })
           return
         }
       }
@@ -1280,13 +1280,13 @@ export default {
 
           this.refreshTable(this.tablePagination)
           this.closeCard()
-          this.$q.notify({ message: 'Статус изменен', color: 'positive', icon: 'thumb_up' })
+          this.$q.notify({ message: this.$t('form_saved'), color: 'positive', icon: 'thumb_up' })
 
           this.tableLoading = false
         })
         .catch(error => {
           let message = this.formatErrorMessage(error)
-          this.$q.notify({ message: `Ошибка изменения статуса: ${message}`, color: 'negative', icon: 'report_problem' })
+          this.$q.notify({ message: `${this.$t('form_saving_error')}: ${message}`, color: 'negative', icon: 'report_problem' })
           this.tableLoading = false
         })
     },

@@ -89,7 +89,6 @@ export default {
   },
   unknown_type: 'Неизвестный тип',
   dictionary_error: 'Ошибка загрузки справочника',
-  saving_error: 'Ошибка сохранения данных',
   refreshed: 'Информация обновлена',
   loading_error: 'Ошибка получения данных',
   confirm: 'Подтвердите действие',
@@ -109,7 +108,8 @@ export default {
   form_invalid: 'Форма содержит ошибки',
   form_undefined: 'Укажите тип заявки и заполните обязательные поля',
   form_empty: 'Заявка не заполнена',
-  form_sent: 'Заявка отправлена',
+  form_saved: 'Заявка отправлена',
+  form_saving_error: 'Ошибка сохранения данных',
   employee_not_found: 'Сотрудник не найден',
   choose_organization: 'Сначала укажите организацию',
   add_message: 'Добавьте сообщение',
@@ -126,6 +126,10 @@ export default {
   initialization_error: 'Ошибка инициализации',
   identification_error: 'Ошибка идентификации',
   configuration_error: 'Ошибка получения конфигурации',
+  recipient_required: 'Не указан адресат',
+  recipient_invalid: 'Адресат не является пользователем портала',
+  stage_saved: 'Статус изменен',
+  stage_saving_error: 'Ошибка изменения статуса',
   error_404: 'Не найдено',
   error_413: 'Слишком большой файл'
 }
