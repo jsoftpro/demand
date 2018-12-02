@@ -22,9 +22,12 @@ public class BasicAuthEntryPoint extends BasicAuthenticationEntryPoint {
         if (isAjax) {
         	auth = "x-" + auth;
         }
-        response.addHeader("WWW-Authenticate", auth);
-        response.addHeader("Access-Control-Allow-Origin", "*");
-        response.addHeader("Content-Type", "text/plain");
+        response.setHeader("WWW-Authenticate", auth);
+        response.setHeader("Content-Type", "text/plain");
+		response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
+		response.setHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
+		response.setHeader("Access-Control-Allow-Headers", "X-Requested-With, Access-Control-Allow-Headers, Origin, Accept, Authorization, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+		response.setHeader("Access-Control-Allow-Credentials", "true");
         val writer = response.getWriter();
         writer.print("Http 401 - " + authenticationException.getMessage().trim());
     }

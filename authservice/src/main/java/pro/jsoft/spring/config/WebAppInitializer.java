@@ -7,6 +7,7 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.web.servlet.DispatcherServlet;
 
 import lombok.val;
+import pro.jsoft.spring.security.CORSFilter;
 
 public class WebAppInitializer extends AbstractSecurityWebApplicationInitializer {
 
@@ -23,5 +24,8 @@ public class WebAppInitializer extends AbstractSecurityWebApplicationInitializer
 		val dispatcher = servletContext.addServlet("dispatcher", dispatcherServlet);
 		dispatcher.setLoadOnStartup(1);
 		dispatcher.addMapping("/");
+
+		val corsFilter = servletContext.addFilter("cors-filter", new CORSFilter());
+		corsFilter.addMappingForUrlPatterns(null, true, "/*");
 	}
 }
