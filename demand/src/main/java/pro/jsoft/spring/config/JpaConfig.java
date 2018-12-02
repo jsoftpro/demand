@@ -72,7 +72,7 @@ public class JpaConfig {
 
 	Properties additionalProperties() {
 		val properties = new Properties();
-		properties.setProperty("hibernate.hbm2ddl.auto", "create-drop");
+		properties.setProperty("hibernate.hbm2ddl.auto", "update");
 		properties.setProperty("hibernate.dialect", env.getProperty("datasource.type"));
 		properties.setProperty("hibernate.jdbc.time_zone", "UTC");
 		properties.setProperty("hibernate.connection.autocommit", "false");

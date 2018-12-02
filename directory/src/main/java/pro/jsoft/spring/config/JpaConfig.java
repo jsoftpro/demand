@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.jndi.JndiLookupFailureException;
 import org.springframework.jndi.JndiObjectFactoryBean;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -38,7 +39,7 @@ public class JpaConfig {
 		try {
 			jndiObjectFactoryBean.afterPropertiesSet();
 		} catch (NamingException e) {
-			throw new RuntimeException("DataSource is not found");
+			throw new JndiLookupFailureException("DataSource is not found", e);
 		}
 		return jndiObjectFactoryBean;
 	}

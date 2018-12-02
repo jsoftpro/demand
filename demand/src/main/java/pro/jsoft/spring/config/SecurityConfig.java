@@ -72,7 +72,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		    .authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/", "/html/**", "/fonts/**", "/css/**", "/images/**", "/js/**").permitAll()
 		    	.antMatchers("/api/**").fullyAuthenticated()
-                .antMatchers(HttpMethod.GET, "/api/config").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/config", "/api/demands/report").permitAll()
 		    	.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 			    .anyRequest().authenticated()
 		    .and()
@@ -93,11 +93,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
             .antMatchers(HttpMethod.OPTIONS, "/**")
-            .antMatchers("/api/config")
-            .antMatchers("/html/**")
-            .antMatchers("/scripts/**")
-            .antMatchers("/styles/**")
-            .antMatchers("/images/**");
+            .antMatchers("/api/config", "/api/demands/report")
+            .antMatchers("/html/**", "/scripts/**", "/styles/**", "/images/**");
     }
     
     @Bean

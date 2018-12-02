@@ -8,6 +8,8 @@ import java.util.TimeZone;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.config.core.GrantedAuthorityDefaults;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -23,6 +25,7 @@ import pro.jsoft.demand.persistence.repositories.DemandRepository;
 import pro.jsoft.demand.persistence.repositories.RulesRepository;
 import pro.jsoft.demand.persistence.repositories.StageRepository;
 import pro.jsoft.demand.rest.types.DemandFilter;
+import pro.jsoft.demand.rest.types.Mode;
 import pro.jsoft.demand.rest.types.PageableResultList;
 import pro.jsoft.spring.security.DetailedUser;
 import pro.jsoft.spring.security.DomainUserDetailsService;
@@ -36,14 +39,19 @@ public class DemandService {
 	private DemandRepository demandRepository;
 	private StageRepository stageRepository;
 	private RulesRepository rulesRepository;
+	private NotificatorService notificatorService;
 
 	@Autowired
-	public DemandService(DomainUserDetailsService userService, DemandRepository demandRepository,
-			StageRepository stageRepository, RulesRepository rulesRepository) {
+	public DemandService(DomainUserDetailsService userService, 
+			DemandRepository demandRepository,
+			StageRepository stageRepository, 
+			RulesRepository rulesRepository, 
+			NotificatorService notificatorService) {
 		this.userService = userService;
 		this.demandRepository = demandRepository;
 		this.stageRepository = stageRepository;
 		this.rulesRepository = rulesRepository;
+		this.notificatorService = notificatorService;
 	}
 
 	
@@ -84,6 +92,8 @@ public class DemandService {
 		val actionManager = new ActionManager(user, rules);
 		actionManager.defineActions(demand);
 
+		notificatorService.notificate(demand);
+		
 		return demand;
 	}
 	
@@ -135,6 +145,10 @@ public class DemandService {
 			completeStage(stage, user);
 
 			savedStage = stageRepository.save(stage);
+			
+			demand.getStages().add(savedStage);
+			notificatorService.notificate(demand);
+
 			return Exceptional.of(savedStage, exception);
 		}).orElseThrow(ResourceNotFoundException::new).orElseThrow();
 	}
@@ -153,6 +167,8 @@ public class DemandService {
 				val rules = rulesRepository.findById(profile);
 				val actionManager = new ActionManager(user, rules);
 				actionManager.defineActions(savedDemand);
+				
+				notificatorService.notificate(savedDemand);
 			} else {
 				log.error("Access denied: USER");
 				savedDemand = null;
@@ -167,9 +183,17 @@ public class DemandService {
 	
 	public PageableResultList<Demand> getAll(DemandFilter filter, String profile) {
 		val user = userService.loadCurrentUser();
+		
+		/*
+		if (Mode.ADMINISTRATOR.equals(filter.getMode()) 
+				&& !user.getAuthorities().contains(new SimpleGrantedAuthority(Mode.ADMINISTRATOR.name()))) {
+			throw new AccessDeniedException("USER");
+		}
+		*/
+		
 		val demands = demandRepository.findByMetadata(profile, filter, user);
 
-		if (demands.getPagination().getRowsNumber() > 0) {
+		if (user != null && demands.getPagination().getRowsNumber() > 0) {
 			val rules = rulesRepository.findById(profile);
 			val actionManager = new ActionManager(user, rules);
 			demands.getResultList().stream().forEach(actionManager::defineActions);

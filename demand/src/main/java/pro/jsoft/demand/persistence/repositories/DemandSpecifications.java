@@ -64,7 +64,7 @@ public class DemandSpecifications {
 		@Override
 		public Predicate toPredicate(final Root<Demand> root, final CriteriaQuery<?> query, final CriteriaBuilder cb) {
 			// Filter by root attributes
-			log.debug("Demand filter: []", filter.toString());
+			log.debug("Demand filter: {}", filter.toString());
 
 			var completePredicate = cb.equal(root.get(Demand_.PROFILE), profile);
 			
