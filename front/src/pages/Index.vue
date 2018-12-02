@@ -156,10 +156,12 @@
           </q-btn-group>
 
           <div ref="card" class="q-pa-lg gutter-sm print">
+
             <div class="print-hidden" style="text-align: center;">
               <div><h1>{{ $t('label.demand_title2', {id: displayedRow.id}) }}</h1></div>
               <div><h2>{{ formatLocalDate(displayedRow.created.date, 'YYYY-MM-DD HH:mm') }}</h2></div>
             </div>
+
             <div><span class="q-title">{{ displayedRow.label }}</span></div>
             <q-field :label="$t('field.employee')" icon="person_outline" :label-width="formLabelWidth" inset="full">
               <div class="col-auto q-pt-xs"><a :href="buildEmployeeLink(displayedRow.uid)" target="_blank">{{ displayedRow.name }}</a></div>
@@ -203,6 +205,22 @@
               <q-rating v-model="displayedRow.rate" disable :max="5" color="orange" size="2rem" />
               <div class="col-auto q-pt-xs"><span class="print-hidden">{{ displayedRow.rate }}</span> {{ displayedRow.opinion }}</div>
             </q-field>
+
+            <div class="print-hidden" style="text-align: center;">
+              <hr />
+              <table style="width:100%">
+                <row v-for="(stage, index) in displayedRow.stages" :key="index">
+                  <td style="width:30%">
+                    <div style="white-space: nowrap">{{ $t('stage.' + stage.action) }}</div>
+                    <div style="white-space: nowrap">{{ formatLocalDate(stage.date, 'YYYY-MM-DD HH:mm') }}</div>
+                  </td>
+                  <td style="width:65%">
+                    <div>{{ stage.actorName }}</div>
+                    <div style="font-style: italic">{{ stage.comment }}</div>
+                  </td>
+                </row>
+              </table>
+            </div>
 
           </div>
         </div>
@@ -381,12 +399,12 @@
 </style>
 
 <script>
+import 'whatwg-fetch'
 import { required, email, numeric, maxLength } from 'vuelidate/lib/validators'
 import QDaterange from '../components/QDaterange'
 import { date } from 'quasar'
 const { formatDate } = date
 import Printd from 'printd'
-
 import texts from '../data/texts.json'
 
 export default {
@@ -1280,13 +1298,13 @@ export default {
 
           this.refreshTable(this.tablePagination)
           this.closeCard()
-          this.$q.notify({ message: this.$t('form_saved'), color: 'positive', icon: 'thumb_up' })
+          this.$q.notify({ message: this.$t('stage_saved'), color: 'positive', icon: 'thumb_up' })
 
           this.tableLoading = false
         })
         .catch(error => {
           let message = this.formatErrorMessage(error)
-          this.$q.notify({ message: `${this.$t('form_saving_error')}: ${message}`, color: 'negative', icon: 'report_problem' })
+          this.$q.notify({ message: `${this.$t('stage_saving_error')}: ${message}`, color: 'negative', icon: 'report_problem' })
           this.tableLoading = false
         })
     },
@@ -1323,6 +1341,7 @@ export default {
       printer.print(
         this.$refs.card,
         `
+        body {font-size: 12pt;}
         [aria-hidden="true"], .q-field-icon {display: none;}
         .print {display: table; margin: 0 40pt; font-family: "Courier New", Courier, monospace;}
         .print-hidden {display: inline;}
@@ -1334,6 +1353,9 @@ export default {
         div.q-field-content {width: 340pt; font-weight: bold;}
         div.q-pt-lg {padding: 15pt}
         a {text-decoration: none; color: #000;}
+        span.q-title {font-size: 14pt; font-weight: bold;}
+        table, table tr: {padding: 0; margin: 0;}
+        table td: {padding: 2pt 1pt 1pt 0; margin: 0;}
         `)
     },
 
@@ -1544,15 +1566,26 @@ export default {
     },
 
     loadConfig () {
-      // There can be different servers of services here. In this case we need to get this config from the base service.
-      const server = location.protocol + '//' + location.hostname + ':' + '8181' // location.port
-      return new Promise((resolve, reject) =>
-        resolve({ data: {
-          user: '',
-          serverAuth: server,
-          serverDirectory: server,
-          serverBack: server
-        } })
+      this.config.serverBack = location.protocol + '//' + location.hostname + ':' + (location.hostname === 'localhost' ? '8181' : location.port)
+
+      return new Promise((resolve, reject) => {
+        const service = this.config.serverBack + '/demand/api/config'
+        fetch(service)
+          .then(response => {
+            if (response.status === 200) {
+              response.json()
+                .then(data => {
+                  this.config.serverAuth = data.auth
+                  this.config.serverDirectory = data.directory
+                  resolve()
+                })
+                .catch(error => reject(error))
+            } else {
+              reject(new Error(response.status + ':' + response.statusText))
+            }
+          })
+          .catch(error => reject(error))
+      }
       )
     },
 
@@ -1581,49 +1614,12 @@ export default {
     },
 
     authForm (data) {
-      return this.$q.dialog({
-        title: 'Выберите пользователя',
-        message: '(только для тестирования)',
-        options: {
-          type: 'radio',
-          model: {},
-          items: [
-            {
-              label: 'Корчагин (пользователь)',
-              value: {
-                username: 'korchagin-vu@co.rosenergoatom.ru',
-                password: '123'
-              }
-            },
-            {
-              label: 'Переслегин (руководитель)',
-              value: {
-                username: 'pereslegin-va@co.rosenergoatom.ru',
-                password: '123'
-              }
-            },
-            {
-              label: 'Познякова (исполнитель 1)',
-              value: {
-                username: 'poznyakova-nn@co.rosenergoatom.ru',
-                password: '123'
-              }
-            },
-            {
-              label: 'Орлова (исполнитель 2)',
-              value: {
-                username: 'orlova-da@co.rosenergoatom.ru',
-                password: '123'
-              }
-            },
-            {
-              label: 'Розенберг (руководитель исполнителя)',
-              value: {
-                username: 'rozenberg-bi@co.rosenergoatom.ru',
-                password: '123'
-              }
-            }
-          ]
+      return this.$login({
+        prompt: {
+          model: {
+            username: '',
+            password: ''
+          }
         },
         cancel: true,
         preventClose: true,
@@ -1658,9 +1654,7 @@ export default {
 
   mounted () {
     this.loadConfig()
-      .then(config => {
-        this.config = config.data
-
+      .then(() => {
         this.$http.authClient.defaults.baseURL = `${this.config.serverAuth}/authservice/api/oauth/token`
         this.$http.authClient.defaults.params = {
           grant_type: 'client_credentials',

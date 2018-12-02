@@ -1,16 +1,73 @@
 import axios from 'axios'
+import 'whatwg-fetch'
 
 export default class AuthHttp {
   constructor () {
-    this.authClient = axios.create({
-      responseType: 'text'
-    })
-    // attribute 'auth' is a truk for a axios' 0.18.0 bug
-    // must be replaced with an <instance>.defaults.headers.common['Authorization']
-    this.authClient.defaults.auth = ''
-    this.authClient.defaults.headers.common = { 'X-Requested-With': 'XMLHttpRequest' }
-    this.apiClient = axios.create({
-    })
+    this.authClient = {
+      defaults: {
+        baseURL: '',
+        responseType: 'text',
+        auth: '',
+        headers: {
+          common: { 'X-Requested-With': 'XMLHttpRequest' }
+        }
+      },
+      auth: function () {
+        let url = this.defaults.baseURL
+        let query = Object.keys(this.defaults.params)
+          .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(this.defaults.params[key]))
+          .reduce((query, pair) => query + (query ? '&' : '') + pair)
+        if (query) url += (url.indexOf('?') === -1 ? '?' : '&') + query
+        let params = {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+          }
+        }
+        console.log(`authClient.post ${url}`)
+        Object.assign(params.headers, this.defaults.headers.common)
+        if (this.defaults.auth) {
+          params.headers['Authorization'] = this.defaults.auth
+        }
+        return new Promise((resolve, reject) => {
+          fetch(url, params)
+            .then(response => {
+              if (response.status === 200) {
+                resolve(response.json())
+              } else if (response.status === 401) {
+                delete this.defaults.auth
+                if (this.defaults.login) {
+                  console.log('Retrieve login form')
+                  this.defaults.login(response)
+                    .then(auth => {
+                      this.defaults.auth = 'Basic ' + btoa(auth.username + ':' + auth.password)
+                      let upperResolve = resolve
+                      let upperReject = reject
+                      return new Promise((resolve, reject) => {
+                        console.log('Retry request token')
+                        this.auth()
+                          .then(response => {
+                            upperResolve(response)
+                          })
+                          .catch(error => upperReject(error))
+                      })
+                    })
+                    .catch(error => reject(error))
+                } else {
+                  reject(new Error('Authentication form is not alowed'))
+                }
+              } else {
+                reject(new Error(response.status + ':' + response.statusText))
+              }
+            })
+            .catch(error => {
+              reject(error)
+            })
+        })
+      }
+    }
+
+    this.apiClient = axios.create({})
     this.apiClient.defaults.auth = ''
   }
   get (url, config) {
@@ -49,9 +106,8 @@ export default class AuthHttp {
   getAuthToken () {
     let that = this
     return new Promise((resolve, reject) => {
-      that.authClient.post()
-        .then(response => {
-          let token = response.data
+      that.authClient.auth()
+        .then(token => {
           if (token && token.access_token) {
             token = token.access_token
           }
@@ -59,30 +115,7 @@ export default class AuthHttp {
           resolve(token)
         })
         .catch(error => {
-          if (error.response &&
-            error.response.status === 401 &&
-            that.authClient.defaults.login) {
-            delete that.authClient.defaults.auth
-            console.log('Retrieve login form')
-            that.authClient.defaults.login(error)
-              .then(auth => {
-                // that.authClient.defaults.headers.common['Authorization'] = 'Basic ' + loginpass
-                that.authClient.defaults.auth = auth
-                let upperResolve = resolve
-                let upperReject = reject
-                return new Promise((resolve, reject) => {
-                  console.log('Retry request token')
-                  that.getAuthToken()
-                    .then(response => {
-                      upperResolve(response)
-                    })
-                    .catch(error => upperReject(error))
-                })
-              })
-              // .catch(error => reject(error))
-          } else {
-            reject(error)
-          }
+          console.log(`Auth error: ${error}`)
         })
     })
   }

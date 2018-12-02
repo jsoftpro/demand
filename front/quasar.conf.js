@@ -7,7 +7,8 @@ module.exports = function (ctx) {
       // 'axios',
       'auth-http',
       'vuelidate',
-      'i18n'
+      'i18n',
+      'login'
     ],
     css: [
       'app.styl'
