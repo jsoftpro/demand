@@ -16,11 +16,12 @@ import pro.jsoft.demand.persistence.model.Demand;
 import pro.jsoft.demand.persistence.model.Stage;
 import pro.jsoft.demand.services.DemandService;
 import test.DemandServiceTestPrototype;
+import test.MockMailConfig;
 import test.MockRepositoriesConfig;
 import test.Users;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { MockUserServiceConfig.class, MockRepositoriesConfig.class })
+@ContextConfiguration(classes = { MockUserServiceConfig.class, MockRepositoriesConfig.class, MockMailConfig.class })
 @ActiveProfiles({"test"})
 public class DemandServiceTest extends DemandServiceTestPrototype {
 	// Allowed

@@ -24,6 +24,9 @@ export default {
     request: 'Request',
     recipient: 'Recipient',
     files: 'Files',
+    executor: 'Executor',
+    serviced_organization: 'Serviced organization',
+    serviced_department: 'Serviced department',
     tip: {
       type_name: 'Start type the name',
       choose_employee: 'First choose an employee',
@@ -41,7 +44,9 @@ export default {
   label: {
     title: 'Demands Management',
     new_request: 'New demand',
+    executors_title: 'Исполнители',
     file_deletion: 'Delete a file',
+    executor_deletion: 'Delete an executor',
     filters: 'Filters',
     reset: 'Reset',
     send: 'Send',
@@ -130,6 +135,10 @@ export default {
   recipient_invalid: 'Reipient\'s account ID is not defined',
   stage_saved: 'Stage has been changed',
   stage_saving_error: 'Stage changing error',
+  executor_saved: 'Executor has been added',
+  executor_deleted: 'Executor has been deleted: {name}',
+  executor_deletion_error: 'Executor deleting error {name}',
+  confirm_executor_deletion: 'Are you sure to delete the executor?',
   error_404: 'Not found',
   error_413: 'The file is too large'
 }

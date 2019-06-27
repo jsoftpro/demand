@@ -73,10 +73,8 @@ public class FileRestController {
 	
 	@DeleteMapping(path = "/files/{fileId}")
 	public ResponseEntity<ResultMessage> remove(@PathVariable(name = "fileId", required = true) Long fileId) {
-		log.debug("Get File: {}", fileId);
-
+		log.debug("Remove File: {}", fileId);
 		fileService.remove(fileId);
-		
 		return new ResponseEntity<>(new ResultMessage(HttpStatus.OK.value(), "SUCCESS"), HttpStatus.OK);
 	}
 	

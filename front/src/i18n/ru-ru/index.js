@@ -24,6 +24,9 @@ export default {
     request: 'Запрос',
     recipient: 'Адресат',
     files: 'Файлы',
+    executor: 'Исполнитель',
+    serviced_organization: 'Обслуживаемая организация',
+    serviced_department: 'Обслуживаемое подразделение',
     tip: {
       type_name: 'Начните вводить ФИО',
       choose_employee: 'Начните с выбора сотрудника',
@@ -41,7 +44,9 @@ export default {
   label: {
     title: 'Управление заявками',
     new_request: 'Новая заявка',
+    executors_title: 'Исполнители',
     file_deletion: 'Удаление файла',
+    executor_deletion: 'Удаление исполнителя',
     filters: 'Фильтры',
     reset: 'Очистить',
     send: 'Отправить',
@@ -130,6 +135,10 @@ export default {
   recipient_invalid: 'Адресат не является пользователем портала',
   stage_saved: 'Статус изменен',
   stage_saving_error: 'Ошибка изменения статуса',
+  executor_saved: 'Исполнитель добавлен',
+  executor_deleted: 'Исполнитель удален: {name}',
+  executor_deletion_error: 'Ошибка удаления исполнителя {name}',
+  confirm_executor_deletion: 'Действительно удалить исполнителя?',
   error_404: 'Не найдено',
   error_413: 'Слишком большой файл'
 }

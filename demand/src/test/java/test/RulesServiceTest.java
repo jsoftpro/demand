@@ -17,7 +17,7 @@ import pro.jsoft.demand.services.RulesService;
 import test.user.MockUserServiceConfig;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { MockUserServiceConfig.class, MockRepositoriesConfig.class })
+@ContextConfiguration(classes = { MockUserServiceConfig.class, MockRepositoriesConfig.class, MockMailConfig.class })
 @ActiveProfiles({"test"})
 public class RulesServiceTest {
 	@Autowired

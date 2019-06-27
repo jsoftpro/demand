@@ -72,7 +72,7 @@ public class Stage implements Serializable {
 	@Column(name = "REC_POS", length = 255, updatable = false)
 	private String recipientPosition;
 	
-	@Column(length = 255, updatable = false)
+	@Column(name = "NOTE", length = 255, updatable = false)
 	private String comment;
 
     @ToString.Exclude

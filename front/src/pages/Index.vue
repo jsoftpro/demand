@@ -14,6 +14,7 @@
           separator="cell">
           <div slot="top-left" slot-scope="props">
             <q-btn icon="create" color="secondary" :label="$t('label.new_request')" @click="openForm" :disable="disabled" />
+            <q-btn v-if="admin" icon="build" color="secondary" class="q-ml-lg" :label="$t('label.executors_title')" @click="openExecutor" :disable="disabled" />
           </div>
           <q-tr slot="header" slot-scope="props" :props="props">
             <q-th v-for="col in props.cols" :key="col.name" :props="props">
@@ -388,6 +389,62 @@
         </div>
       </q-modal-layout>
     </q-modal>
+
+    <!-- EXECUTOR PANEL -->
+    <q-modal :value="executorOpened" no-backdrop-dismiss no-esc-dismiss no-route-dismiss :content-css="{minWidth: '40vw', minHeight: '60vh'}">
+      <q-modal-layout>
+        <q-toolbar slot="header">
+          <q-btn
+            flat
+            round
+            icon="reply"
+            @click="closeExecutor" />
+          <q-toolbar-title>{{ $t('label.executors_title') }}</q-toolbar-title>
+          <q-btn
+            :label="$t('label.send')"
+            no-wrap
+            color="secondary"
+            align="right"
+            @click="saveExecutor" />
+        </q-toolbar>
+        <div style="max-width: 95vw;" class="q-pa-lg gutter-sm">
+          <q-field :label="$t('field.executor')" icon="person_outline" :label-width="formLabelWidth" inset="full">
+            <q-search v-model="executor.name" @clear="clearExecutor" @input="resetExecutor" no-icon :placeholder="$t('field.tip.type_name')" clearable @blur="$v.executor.name.$touch" :error="$v.executor.name.$error">
+              <q-autocomplete @search="searchEmployee" @selected="selectedExecutor" :min-characters="formMinChars" :max-results="formMaxResult" />
+            </q-search>
+          </q-field>
+          <q-field :label="$t('field.serviced_organization')" icon="business" :label-width="formLabelWidth" inset="full">
+            <q-search v-model="executor.servicedOrganizationMask" @input="resetServicedOrganization" no-icon @blur="$v.executor.servicedOrganizationName.$touch" :error="$v.executor.servicedOrganizationName.$error">
+              <q-autocomplete @search="searchOrganization" @selected="selectedServicedOrganization" :min-characters="formMinChars" :max-results="formMaxResult" :placeholder="$t('field.tip.choose_employee')" />
+            </q-search>
+          </q-field>
+          <q-field :label="$t('field.serviced_department')" icon="people_outline" :label-width="formLabelWidth" inset="full">
+            <q-search v-model="executor.servicedDepartmentMask" @input="resetServicedDepartment" no-icon>
+              <q-autocomplete @search="searchServicedDepartment" @selected="selectedServicedDepartment" :min-characters="formMinChars" :max-results="formMaxResult" :placeholder="$t('field.tip.choose_employee')" />
+            </q-search>
+          </q-field>
+        </div>
+        <div v-for="(executor, index) in executors" :key="index" class="full-width q-ma-sm">
+          <div class="row q-ma-sm">
+            <div class="col-1 q-ma-sm">
+              <q-btn
+                round
+                color="warning"
+                icon="delete_forever"
+                @click="removeExecutor(executor)" />
+            </div>
+            <div class="col-4 q-ma-sm q-body-1">{{ executor.name }}</div>
+            <div class="col q-ma-sm text-weight-bold">
+              <span>{{ executor.servicedOrganizationName }}</span>
+              <br />
+              <span class="q-caption">{{ executor.servicedDepartmentName }}</span>
+            </div>
+          </div>
+        </div>
+
+      </q-modal-layout>
+    </q-modal>
+
   </q-page>
 </template>
 
@@ -411,6 +468,7 @@ export default {
   name: 'PageIndex',
   data () {
     return {
+      admin: true,
       disabled: true,
       profile: '',
       config: {
@@ -506,11 +564,9 @@ export default {
       tableData: [
       ],
       displayedRow: this.newDisplayedRow(),
-      stagesRow: {},
       cardOpened: false,
       filterOpened: false,
       formOpened: false,
-      stagesOpened: false,
       employee: this.newEmployee(),
       dynformList: [],
       dynform: { fields: [] },
@@ -520,7 +576,11 @@ export default {
       opinion: '',
       rate: null,
       actionOpened: false,
+      stagesRow: {},
+      stagesOpened: false,
       stage: this.newStage(),
+      executorOpened: false,
+      executor: this.newExecutor(),
       uploadOpened: false,
       rateOpened: false,
       mode: null,
@@ -537,7 +597,8 @@ export default {
           label: this.$t('mode.executor'),
           value: 'EXECUTOR'
         }
-      ]
+      ],
+      executors: []
     }
   },
   computed: {
@@ -565,6 +626,11 @@ export default {
       recipientName: { required },
       recipientUid: { required },
       comment: { required, maxLength: maxLength(250) }
+    },
+    executor: {
+      name: { required },
+      servicedOrganizationName: { required },
+      servicedOrganizationId: { required }
     }
   },
   methods: {
@@ -1501,6 +1567,202 @@ export default {
         })
     },
 
+    newExecutor () {
+      return {
+        profile: this.profile,
+        mask: null,
+        name: null,
+        uid: null,
+        email: null,
+        phone: null,
+        staffId: null,
+        organizationId: null,
+        organizationName: null,
+        departmentId: null,
+        departmentName: null,
+        servicedOrganizationId: null,
+        servicedOrganizationName: null,
+        servicedOrganizationMask: null,
+        servicedOrganizationBranch: null,
+        servicedDepartmentId: null,
+        servicedDepartmentName: null,
+        servicedDepartmentMask: null,
+        servicedDepartmentBranch: null,
+        branch: null
+      }
+    },
+
+    selectedExecutor (item) {
+      console.log(`selectedExecutor: ${item.label}`)
+      let staff = item.object
+      this.executor.uid = staff.userId
+      this.executor.staffId = staff.id
+      this.executor.name = [staff.surname, staff.name, staff.patronymic].join(' ')
+      this.executor.email = staff.email
+
+      this.executor.mask = this.employee.name
+
+      this.findOrganizationByDepartmentId(
+        (staff.orgIdFunc ? staff.orgIdFunc : staff.orgId),
+        department => {
+          let structure = JSON.parse(department.json)
+          this.executor.organizationId = structure.id
+          this.executor.organizationName = structure.name
+        })
+
+      this.findDepartmentById(
+        (staff.orgIdFunc ? staff.orgIdFunc : staff.orgId),
+        department => {
+          let structure = JSON.parse(department.json)
+          this.executor.departmentId = structure.id
+          this.executor.departmentName = structure.name
+        })
+
+      this.executor.phone = staff.phoneList ? staff.phoneList.map(entry => entry.name).join('; ') : ''
+    },
+
+    openExecutor () {
+      this.loadExecutors()
+      this.executorOpened = true
+    },
+
+    resetExecutor (query) {
+      if (this.executor && this.executor.name) {
+        if (query !== this.executor.name) {
+          this.clearExecutor()
+        }
+      }
+    },
+
+    clearExecutor () {
+      this.executor = this.newExecutor()
+    },
+
+    closeExecutor () {
+      this.executorOpened = false
+      this.clearExecutor()
+      this.executors = []
+    },
+
+    resetServicedOrganization (query) {
+      if (this.executor) {
+        if (query !== this.employee.servicedOrganizationName) {
+          this.executor.servicedOrganizationName = null
+          this.executor.servicedOrganizationMask = null
+          this.executor.servicedOrganizationId = null
+          this.executor.servicedOrganizationBranch = null
+          this.executor.servicedDepartmentId = null
+          this.executor.servicedDepartmentName = null
+          this.executor.servicedDepartmentMask = null
+          this.executor.servicedDepartmentBranch = null
+        }
+      }
+    },
+
+    selectedServicedOrganization (item) {
+      console.log(`selectedServicedOrganization ${item.label}`)
+      this.executor.servicedOrganizationName = item.object.name
+      this.executor.servicedOrganizationMask = this.executor.servicedOrganizationName
+      this.executor.servicedOrganizationId = item.object.id
+      this.executor.servicedOrganizationBranch = item.object.branch
+      this.executor.servicedDepartmentId = null
+      this.executor.servicedDepartmentName = null
+      this.executor.servicedDepartmentMask = null
+    },
+
+    searchServicedDepartment (query, done) {
+      if (this.executor.servicedOrganizationId) {
+        return this.searchStructure(query, this.executor.servicedOrganizationId, done)
+      } else {
+        this.$q.notify('Сначала укажите организацию')
+      }
+    },
+
+    resetServicedDepartment (query) {
+      if (this.executor) {
+        if (query !== this.executor.servicedDepartmentName) {
+          this.executor.servicedDepartmentId = null
+          this.executor.servicedDepartmentName = null
+          this.executor.servicedDepartmentMask = query
+          this.executor.servicedDepartmentBranch = null
+        }
+      }
+    },
+
+    selectedServicedDepartment (item) {
+      console.log(`selectedServicedDepartment ${item.label}`)
+      this.executor.servicedDepartmentId = item.object.id
+      this.executor.servicedDepartmentName = item.object.name
+      this.executor.servicedDepartmentMask = this.executor.servicedDepartmentName
+      this.executor.servicedDepartmentBranch = item.object.branch
+    },
+
+    saveExecutor () {
+      if (this.executorOpened) {
+        this.$v.executor.$touch()
+        if (this.$v.executor.$error) {
+          this.$q.notify({ message: this.$t('form_invalid'), color: 'negative', icon: 'report_problem' })
+          return
+        }
+      }
+
+      this.executor.profile = this.profile
+      this.executor.branch = (this.executor.servicedDepartmentBranch || this.executor.servicedOrganizationBranch)
+      console.log(JSON.stringify(this.executor))
+
+      const service = `${this.config.serverBack}/demand/api/executors`
+      this.$http.post(service, this.executor)
+        .then(response => {
+          this.executor = this.newExecutor()
+          this.$q.notify({ message: this.$t('executor_saved'), color: 'positive', icon: 'thumb_up' })
+          this.loadExecutors()
+        })
+        .catch(error => {
+          let message = this.formatErrorMessage(error)
+          this.$q.notify({ message: `${this.$t('form_saving_error')}: ${message}`, color: 'negative', icon: 'report_problem' })
+        })
+    },
+
+    loadExecutors () {
+      const service = `${this.config.serverBack}/demand/api/executors`
+      let params = {
+        profile: this.profile
+      }
+      this.$http.get(service, {params: params})
+        .then(response => {
+          this.executors = response.data
+          this.$q.notify({ message: this.$t('refreshed'), color: 'tertiary', icon: 'thumb_up' })
+        })
+        .catch(error => {
+          let message = this.formatErrorMessage(error)
+          this.$q.notify({ message: `${this.$t('dictionary_error')}: ${message}`, color: 'negative', icon: 'report_problem' })
+        })
+    },
+
+    removeExecutor (executor) {
+      this.$q.dialog({
+        title: this.$t('label.executor_deletion'),
+        message: this.$t('confirm_executor_deletion'),
+        ok: true,
+        cancel: true
+      })
+        .then(() => {
+          const service = `${this.config.serverBack}/demand/api/executors/${executor.id}`
+          this.$http.delete(service)
+            .then(() => {
+              this.$q.notify({ message: this.$t('executor_deleted', {name: executor.name}), color: 'positive', icon: 'thumb_up' })
+              this.loadExecutors()
+            })
+            .catch(error => {
+              let message = this.formatErrorMessage(error)
+              this.$q.notify({ message: `${this.$t('executor_deletion_error', {name: executor.name})}: ${message}` })
+            })
+        })
+        .catch(() => {
+          this.$q.notify({ message: this.$t('cancelled'), color: 'orange', icon: 'warning' })
+        })
+    },
+
     formatLocalDate (zuluDate, pattern) {
       let d = new Date(zuluDate)
       // d.setHours(d.getHours() - (d.getTimezoneOffset() / 60))
@@ -1594,7 +1856,7 @@ export default {
       let params = {
         profile: this.profile
       }
-      return this.$http.get(service, { params: params })
+      return this.$http.get(service, {params: params})
     },
 
     loadForms () {
@@ -1602,7 +1864,7 @@ export default {
       let params = {
         profile: this.profile
       }
-      return this.$http.get(service, { params: params })
+      return this.$http.get(service, {params: params})
     },
 
     identify () {
@@ -1658,7 +1920,7 @@ export default {
         this.$http.authClient.defaults.baseURL = `${this.config.serverAuth}/authservice/api/oauth/token`
         this.$http.authClient.defaults.params = {
           grant_type: 'client_credentials',
-          client: JSON.stringify([this.profile, 'DIRECTORY'])
+          client: this.profile
         }
 
         this.$http.authClient.defaults.login = this.authForm

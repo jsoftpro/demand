@@ -15,7 +15,7 @@ import pro.jsoft.demand.persistence.model.Executor;
 import pro.jsoft.demand.persistence.repositories.ExecutorRepository;
 
 @Repository
-@Profile("demo")
+@Profile("demo~")
 @Slf4j
 public class ExecutorRepositoryDemoImpl implements ExecutorRepository {
 	private Map<String, List<Executor>> executors = new HashMap<>(); 

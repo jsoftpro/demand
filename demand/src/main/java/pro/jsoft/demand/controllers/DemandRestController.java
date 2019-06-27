@@ -1,6 +1,7 @@
 package pro.jsoft.demand.controllers;
 
 import java.beans.PropertyEditorSupport;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -35,7 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
-import pro.jsoft.demand.controllers.convertors.DemandListToCsvConverter;
+import pro.jsoft.demand.controllers.converters.DemandListToCsvConverter;
 import pro.jsoft.demand.persistence.model.Demand;
 import pro.jsoft.demand.persistence.model.Stage;
 import pro.jsoft.demand.rest.types.DateRange;
@@ -132,7 +133,10 @@ public class DemandRestController {
 
 	@GetMapping(path = "/report", produces = { MediaType.TEXT_PLAIN_VALUE })
 	@ResponseBody
-	public HttpEntity<Resource> getReport(@RequestParam String from, @RequestParam String to, @RequestParam(required = true) String profile) {
+	public HttpEntity<Resource> getReport(@RequestParam(required = true) String from, 
+			@RequestParam(required = true) String to, 
+			@RequestParam(required = true) String profile,
+			@RequestParam(required = false) String charset) {
 		log.debug("Entry method DemandRestController.getReport {} {} {}", profile, from, to);
 		
 		val fromCalendar = Calendar.getInstance();
@@ -159,7 +163,11 @@ public class DemandRestController {
 			throw new ResourceNotFoundException();
 		}
 		
-		Resource resource = new ByteArrayResource(csv.getBytes());
+		if (charset == null) {
+			charset = "UTF8";
+		}
+		
+		Resource resource = new ByteArrayResource(csv.getBytes(Charset.forName(charset)));
 		val headers = new HttpHeaders();
 		headers.setContentType(MediaType.parseMediaType("text/csv"));
         headers.setContentDispositionFormData("attachment", "report.csv");

@@ -72,7 +72,7 @@ public class JpaConfig {
 
 	protected Properties additionalProperties() {
 		val properties = new Properties();
-		properties.setProperty("hibernate.hbm2ddl.auto", "validate");
+		properties.setProperty("hibernate.hbm2ddl.auto", "none");
 		properties.setProperty("hibernate.dialect", env.getProperty("datasource.type"));
 
 		properties.setProperty("hibernate.cache.use_second_level_cache", "true");

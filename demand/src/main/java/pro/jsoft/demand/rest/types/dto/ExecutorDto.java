@@ -2,8 +2,6 @@ package pro.jsoft.demand.rest.types.dto;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,8 +17,8 @@ import lombok.NoArgsConstructor;
 
 public class ExecutorDto implements Serializable {
 	private static final long serialVersionUID = 1L;
-
 	private Long id;	
+	private String profile;
     private String name;
     private String uid;
     private String email;

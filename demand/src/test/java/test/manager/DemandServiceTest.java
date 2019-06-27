@@ -13,10 +13,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import pro.jsoft.demand.actions.Action;
 import pro.jsoft.demand.services.DemandService;
 import test.DemandServiceTestPrototype;
+import test.MockMailConfig;
 import test.MockRepositoriesConfig;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { MockUserServiceConfig.class, MockRepositoriesConfig.class })
+@ContextConfiguration(classes = { MockUserServiceConfig.class, MockRepositoriesConfig.class, MockMailConfig.class })
 @ActiveProfiles({"test"})
 public class DemandServiceTest extends DemandServiceTestPrototype {
 	// Allowed
