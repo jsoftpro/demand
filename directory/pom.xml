@@ -41,7 +41,7 @@
 
 		<!-- Test -->
 		<junit.version>4.12</junit.version>
-		<postgresql-jdbc.version>42.2.5</postgresql-jdbc.version>
+		<postgresql-jdbc.version>42.2.25</postgresql-jdbc.version>
 
 	</properties>
 
