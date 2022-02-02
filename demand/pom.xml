@@ -53,7 +53,7 @@
 		<!-- Test -->
 		<junit.version>4.12</junit.version>
 		<mockito.version>2.23.0</mockito.version>
-		<postgresql-jdbc.version>42.2.5</postgresql-jdbc.version>
+		<postgresql-jdbc.version>42.2.25</postgresql-jdbc.version>
 
 	</properties>
 
